@@ -27,8 +27,9 @@ WORKDIR /app
 COPY --from=backend-build /out .
 COPY --from=frontend-build /app/dist/talab-web/browser ./wwwroot
 
-# Production defaults
-ENV ASPNETCORE_URLS=http://+:8080 \
+# Production defaults (listens on both 80 and 8080 for CapRover and standard docker)
+ENV ASPNETCORE_URLS=http://+:80;http://+:8080 \
+    PORT=80 \
     ASPNETCORE_ENVIRONMENT=Production \
     Database__Provider=Postgres \
     Database__Migrate=true \
@@ -39,6 +40,7 @@ ENV ASPNETCORE_URLS=http://+:8080 \
 RUN mkdir -p /data && chown -R $APP_UID /data
 VOLUME /data
 USER $APP_UID
+EXPOSE 80
 EXPOSE 8080
-HEALTHCHECK --interval=15s --timeout=5s --start-period=40s --retries=5 CMD curl -fsS http://localhost:8080/health || exit 1
+HEALTHCHECK --interval=15s --timeout=5s --start-period=40s --retries=5 CMD curl -fsS http://localhost:80/health || curl -fsS http://localhost:8080/health || exit 1
 ENTRYPOINT ["dotnet", "Talab.Api.dll"]

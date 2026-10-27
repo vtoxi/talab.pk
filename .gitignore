@@ -6,6 +6,7 @@
 **/.angular/
 publish/
 *.zip
+*.tar
 
 # Environment and secrets
 .env
