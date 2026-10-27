@@ -131,6 +131,10 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers();
 app.MapHub<Talab.Api.Realtime.AppHub>("/hubs/app");
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })); // alive
@@ -146,5 +150,16 @@ app.MapGet("/health/ready", async (AppDb db, CancellationToken ct) =>
     }
     catch { return Results.Json(new { status = "database error" }, statusCode: 503); }
 });
+
+app.MapGet("/config.json", (IConfiguration cfg) => Results.Ok(new
+{
+    apiUrl = "",
+    googleClientId = cfg["Google:ClientId"] ?? "",
+    tileUrl = cfg["Tile:Url"] ?? "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    tileAttribution = cfg["Tile:Attribution"] ?? "© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+    tileMaxZoom = cfg.GetValue<int>("Tile:MaxZoom", 19)
+}));
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
