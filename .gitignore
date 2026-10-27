@@ -1,0 +1,21 @@
+# Build outputs
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+scripts/deploy.config.ps1
+
+# IDE & Tooling
+.claude/
+.vscode/
+.vs/
+*.user
+*.suo
+App_Data/
+artifacts/

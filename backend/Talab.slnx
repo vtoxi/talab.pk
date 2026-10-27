@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Talab.Api/Talab.Api.csproj" />
+    <Project Path="src/Talab.Application/Talab.Application.csproj" />
+    <Project Path="src/Talab.Domain/Talab.Domain.csproj" />
+    <Project Path="src/Talab.Infrastructure/Talab.Infrastructure.csproj" />
+    <Project Path="src/Talab.Migrations.Postgres/Talab.Migrations.Postgres.csproj" />
+    <Project Path="src/Talab.Migrations.SqlServer/Talab.Migrations.SqlServer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Talab.Tests/Talab.Tests.csproj" />
+  </Folder>
+</Solution>
