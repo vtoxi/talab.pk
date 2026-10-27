@@ -4,6 +4,7 @@
 **/node_modules/
 **/dist/
 **/.angular/
+publish/
 
 # Environment and secrets
 .env
