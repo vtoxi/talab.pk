@@ -5,6 +5,7 @@
 **/dist/
 **/.angular/
 publish/
+*.zip
 
 # Environment and secrets
 .env
