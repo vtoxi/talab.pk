@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/.angular/
+publish/
+.git/
+.claude/
+.vs/
+.vscode/
+artifacts/
+*.user
+*.suo

@@ -1,0 +1,7 @@
+{
+  "apiUrl": "",
+  "googleClientId": "320378941330-q7k77qsk6sl9vll0ard9bkm3k9o9ar46.apps.googleusercontent.com",
+  "tileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "tileAttribution": "© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+  "tileMaxZoom": 19
+}

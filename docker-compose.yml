@@ -1,0 +1,67 @@
+# Production-style stack: database, API, web. Copy .env.example to .env and fill it in, then:
+#     docker compose up -d --build
+# Only the web container is exposed (port WEB_PORT). Put a TLS terminator (Caddy, nginx, a load balancer) in front of it.
+#
+# SQL Server instead of Postgres:  docker compose --profile mssql up -d   with DB_PROVIDER=SqlServer and DB_CONNECTION set in .env
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: talab
+      POSTGRES_USER: talab
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U talab -d talab"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mssql:
+    profiles: [mssql]
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes: [mssqldata:/var/opt/mssql]
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      Database__Provider: ${DB_PROVIDER:-Postgres}
+      Database__Migrate: "true"            # one API container only; with several, run migrations from the SQL scripts instead
+      ConnectionStrings__Default: ${DB_CONNECTION:-Host=db;Database=talab;Username=talab;Password=${DB_PASSWORD}}
+      Jwt__Key: ${JWT_KEY:?set JWT_KEY in .env (random, 32+ characters)}
+      Google__ClientId: ${GOOGLE_CLIENT_ID:?set GOOGLE_CLIENT_ID in .env}
+      Admin__Emails__0: ${ADMIN_EMAIL:?set ADMIN_EMAIL in .env}
+      Cors__Origins__0: ${PUBLIC_URL:?set PUBLIC_URL in .env}
+      App__BaseUrl: ${PUBLIC_URL}
+      Smtp__Host: ${SMTP_HOST:-}
+      Smtp__Port: ${SMTP_PORT:-587}
+      Smtp__User: ${SMTP_USER:-}
+      Smtp__Password: ${SMTP_PASSWORD:-}
+      Smtp__From: ${SMTP_FROM:-Talab <no-reply@talab.pk>}
+    volumes: [apidata:/data]
+    # not published: reached only through the web container (/api and /hubs)
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      api: { condition: service_healthy }
+    environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      TILE_URL: ${TILE_URL:-}
+      TILE_ATTRIBUTION: ${TILE_ATTRIBUTION:-}
+      TILE_MAX_ZOOM: ${TILE_MAX_ZOOM:-19}
+    ports: ["${WEB_PORT:-8081}:8080"]
+
+volumes:
+  pgdata:
+  mssqldata:
+  apidata:
